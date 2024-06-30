@@ -1,0 +1,29 @@
+{
+  "name": "tothefields",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "packageManager": "yarn@4.3.0",
+  "scripts": {
+    "reset": "node ./scripts/reset.js",
+    "shared": "yarn workspace shared build",
+    "mobile": "yarn workspace mobile start",
+    "server": "yarn workspace server dev",
+    "docker": "open /Applications/Docker.app",
+    "pods": "cd libs/mobile/ios && pod install && cd ../../..",
+    "gradle": "cd libs/mobile/android && ./gradlew clean && cd ../../.."
+  },
+  "workspaces": {
+    "packages": [
+      "libs/server",
+      "libs/shared",
+      "libs/mobile"
+    ]
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21"
+  },
+  "dependencies": {
+    "axios": "^1.7.2"
+  }
+}

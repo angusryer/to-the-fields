@@ -1,0 +1,38 @@
+{
+  "root": true,
+  "references": [
+    { "path": "./libs/mobile" },
+    { "path": "./libs/shared" },
+    { "path": "./libs/server" }
+  ],
+  "exclude": [
+    "**/node_modules/**",
+    "**/build/**",
+    "**/dist/**",
+    "**/jest-cache/**",
+    "**/logs/**",
+    "**/scripts/**",
+    "**/deploy/**",
+    "**/*.d.ts"
+  ],
+  "compileOnSave": true,
+  "compilerOptions": {
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "composite": true,
+    "module": "commonjs",
+    "strict": true,
+    "sourceMap": true,
+    "removeComments": true,
+    "experimentalDecorators": true,
+    "target": "ES2015",
+    "emitDecoratorMetadata": true,
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "declaration": true,
+    "declarationMap": true,
+    "types": ["node"],
+    "typeRoots": ["node_modules/@types", "types"],
+    "lib": ["ES2015", "DOM"]
+  }
+}

@@ -1,0 +1,6 @@
+node_modules
+cache
+**/install-state.gz
+
+# VSCode settings
+*.vscode/
