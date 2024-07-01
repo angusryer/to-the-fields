@@ -66,19 +66,16 @@ class AuthService {
    * and return the user data if it is.
    */
   public async checkForExistingUser(): Promise<SupabaseAuthUser | null> {
-    let decodedToken: any;
     const token = (await this.secureStorage.get()) ?? undefined;
     if (!token) {
       dev('No existing session token stored locally. Checking remote.');
     } else {
-      dev('Existing session token found in secure storage. Checking expiry.');
-      decodedToken = jwtDecode(token);
-      if (decodedToken.exp * 1000 < Date.now()) {
-        dev('Token has expired. Removing from secure storage.');
-        await this.secureStorage.remove();
-        return null;
-      }
+      dev('Existing session token found in secure storage. Validating it.');
     }
+
+    // Here we might decode the token and check if it's expired or if the audience is correct
+    // But since we are using Supabase Auth, we can call `getUser` and let the library handle session validation using our token.
+    // NOTE: This function may trigger an Auth event, so we should be careful with it.
 
     const { data, error } = await this.authClient.getUser(token);
 
@@ -190,6 +187,19 @@ class AuthService {
 
     dev('Removing token from secure storage');
     await this.secureStorage.remove();
+  }
+
+  /**
+   * Initiate the password reset process with the external auth provider service.
+   */
+  public async forgotPassword(email: string): Promise<void> {
+    const { error } = await this.authClient.resetPasswordForEmail(email);
+
+    if (error) {
+      throw new Error(
+        'Error initiating password reset: ' + JSON.stringify(error, null, 2),
+      );
+    }
   }
 }
 
