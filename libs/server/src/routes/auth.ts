@@ -10,6 +10,10 @@ export default class AuthRoutes {
      * the email and role provided.
      */
     this.app.post(routes.auth.register, async (req, res) => {
+      const selectedRole = req?.body?.role;
+      console.log("Selected role:", selectedRole);
+      // TODO: Save the selected role AND update the registered state in Supabase Auth built-in user table
+      // + ie.: `user_metadata?.registered` and `user_metadata?.role`
       // const authResult = await this.db.client.auth.admin.createUser({});
       // const dbResult = await this.db.client.from<Users, UserSchema>("users").insert({
       //   id: req?.body?.id,

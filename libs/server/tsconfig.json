@@ -1,7 +1,7 @@
 {
   "extends": "../../tsconfig.json",
   "exclude": ["node_modules", "dist"],
-  "include": ["./src", "../../types"],
+  "include": ["./src", "../../@types"],
   "ts-node": {
     "files": true
   },

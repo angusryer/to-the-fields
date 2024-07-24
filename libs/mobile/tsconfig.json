@@ -1,6 +1,6 @@
 {
   "extends": "@react-native/typescript-config/tsconfig.json",
-  "include": [".", "../../types/**/*"],
+  "include": [".", "../../@types/**/*"],
   "compilerOptions": {
     "noEmit": false,
     "emitDeclarationOnly": true,

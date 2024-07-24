@@ -1,0 +1,8 @@
+{
+  "welcome": "Welcome!",
+  "message": "This short onboarding will help us understand your needs, whether you're a parent looking to sign up your kids for a local league or a league organizer setting up a new league and generating invite links. Let's get started and head to the fields!",
+  "roles": {
+    "parent": "Parent",
+    "organizer": "Organizer"
+  }
+}

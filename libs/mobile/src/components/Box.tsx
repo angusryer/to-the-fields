@@ -1,7 +1,7 @@
-import React, { DependencyList, useMemo } from 'react';
+import React from 'react';
 import { StyleSheet, ViewProps } from 'react-native';
 import Animated from 'react-native-reanimated';
-import { Theme, useTheme } from '@react-navigation/native';
+import { spaces, useStyles } from '../utils/theme';
 
 interface ScreenProps extends ViewProps {
   children: React.ReactNode;
@@ -10,7 +10,7 @@ interface ScreenProps extends ViewProps {
 export const Screen = ({ children, ...rest }: ScreenProps) => {
   const styles = useStyles((colors) => ({
     screen: {
-      ...boxStyles.screen,
+      flex: 1,
       backgroundColor: colors.background,
     },
   }));
@@ -22,27 +22,8 @@ export const Screen = ({ children, ...rest }: ScreenProps) => {
   );
 };
 
-const boxStyles = StyleSheet.create({
-  screen: {
-    flex: 1,
-  },
-});
-
 const Box = {
   Screen,
 };
 
 export default Box;
-
-export const useStyles = <
-  T extends StyleSheet.NamedStyles<T> | StyleSheet.NamedStyles<any>,
->(
-  create: (colors: Theme['colors']) => T,
-  deps: DependencyList = [],
-): T => {
-  const { dark, colors } = useTheme();
-  return useMemo(
-    () => StyleSheet.create(create(colors)),
-    [colors, ...deps, dark],
-  );
-};

@@ -1,6 +1,6 @@
 import Jwt = require("jsonwebtoken");
 import { NextFunction, Request, Response } from "express";
-import { HttpCodes, Role, User } from "shared";
+import { HttpCodes, TRole, User } from "shared";
 import { reply } from "./http";
 
 class Auth {
@@ -57,7 +57,7 @@ class Auth {
     return Jwt.sign(payload, jwtSecret);
   }
 
-  public requireRole(role: Role) {
+  public requireRole(role: TRole) {
     return (req: Request, res: Response, next: NextFunction) => {
       if (!req.user?.roles?.includes(role)) {
         return reply(res, { status: HttpCodes.Forbidden, message: "Insufficient permissions" });

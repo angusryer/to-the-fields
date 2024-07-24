@@ -1,4 +1,4 @@
-export type Role =
+export type TRole =
   | "account_owner"
   | "admin"
   | "organizer"
@@ -7,3 +7,14 @@ export type Role =
   | "coach"
   | "parent"
   | "player";
+
+export enum ERole {
+  AccountOwner = "account_owner",
+  Admin = "admin",
+  Organizer = "organizer",
+  Assistant = "assistant",
+  Referee = "referee",
+  Coach = "coach",
+  Parent = "parent",
+  Player = "player",
+}

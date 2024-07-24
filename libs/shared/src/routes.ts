@@ -1,5 +1,6 @@
 const API_V1 = "/api/v1";
 export const routes = {
+  locales: `/locales`,
   app: {
     leagues: `${API_V1}/app/leagues`,
     teams: `${API_V1}/app/teams`,
@@ -13,9 +14,7 @@ export const routes = {
     delete: `${API_V1}/auth/delete`,
     profile: `${API_V1}/auth/profile`,
   },
-  health: {
-    check: `${API_V1}/healthcheck`,
-  },
+  check: `${API_V1}/check`,
 };
 
 export const externalApi = {

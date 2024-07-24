@@ -2,15 +2,24 @@ import React from 'react';
 import {
   KeyboardAvoidingView,
   Pressable,
+  StyleProp,
   StyleSheet,
   Text,
   TextInput,
+  TextInputProps,
+  TextStyle,
   View,
 } from 'react-native';
 import { dev } from '../utils/console';
 import AuthService from '../services/AuthService';
 import { User as SupabaseAuthUser } from '@supabase/supabase-js';
 import { ScrollView } from 'react-native-gesture-handler';
+import { useTranslation } from 'react-i18next';
+import { Button } from '../components/Buttons';
+import { t } from 'i18next';
+import { ErrorMessage } from '../components/ErrorMessage';
+import { radii, spaces, useStyles } from '../utils/theme';
+import { Input } from '../components/Inputs';
 
 export enum AuthState {
   UNAUTHENTICATED,
@@ -41,22 +50,25 @@ export enum AppState {
 }
 
 interface AuthControllerProps {
+  appState: AppState;
   setAppState: (state: AppState) => void;
   setAuthProviderUser: (user: SupabaseAuthUser | null) => void;
 }
 
 export const AuthController = ({
+  appState,
   setAppState,
   setAuthProviderUser,
 }: Readonly<AuthControllerProps>) => {
+  const { t } = useTranslation(['common', 'auth']);
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [error, setError] = React.useState<string | undefined>();
+  const [info, setInfo] = React.useState<string | undefined>();
 
   const createAccount = async (): Promise<void> => {
     if (!email || !password) {
-      dev('Email and password are required');
-      setError('Email and password are required');
+      setError(t('register.required', { ns: 'auth' }));
       return;
     }
 
@@ -73,7 +85,7 @@ export const AuthController = ({
       setAppState(AppState.CONFIGURING_NETWORK);
     } catch (err) {
       dev('Error registering:', err);
-      setError('Error registering. Please try again.');
+      setError(t('register.error', { ns: 'auth' }));
       setAppState(AppState.IDLE);
     }
   };
@@ -81,7 +93,7 @@ export const AuthController = ({
   const login = async (): Promise<void> => {
     if (!email || !password) {
       dev('Email and password are required');
-      setError('Email and password are required');
+      setError(t('login.required', { ns: 'auth' }));
       return;
     }
 
@@ -95,7 +107,7 @@ export const AuthController = ({
       setAppState(AppState.CONFIGURING_NETWORK);
     } catch (err: any) {
       if (err?.message?.includes('Incorrect credentials')) {
-        setError('Incorrect password or email.');
+        setError(t('login.incorrect', { ns: 'auth' }));
       } else {
         setError('Error logging in. Please try again.');
       }
@@ -105,71 +117,78 @@ export const AuthController = ({
 
   const forgotPassword = async (): Promise<void> => {
     if (!email) {
-      dev('Email is required');
-      setError('Email is required.');
+      setError(t('reset.required', { ns: 'auth' }));
       return;
     }
 
     setError(undefined);
+    setInfo(undefined);
     setAppState(AppState.RESETTING_PASSWORD);
 
     try {
       await AuthService.forgotPassword(email);
-      setError('Password reset email sent.');
+      setError(undefined);
+      setInfo(t('reset.sent', { ns: 'auth' }));
       setAppState(AppState.IDLE);
     } catch (err) {
       dev('Error resetting password:', err);
-      setError('Error resetting password. Please try again.');
+      setError(t('reset.error', { ns: 'auth' }));
       setAppState(AppState.IDLE);
     }
   };
 
+  const disabled = shouldBeDisabled(email, password, appState);
+
   return (
-    <ScrollView>
-      <KeyboardAvoidingView style={styles.sectionContainer}>
-        <TextInput
+    <ScrollView
+      style={styles.sectionContainer}
+      contentContainerStyle={styles.sectionContentContainer}>
+      <KeyboardAvoidingView>
+        <Input
+          inputMode="email"
           onChangeText={setEmail}
-          placeholder="Email"
-          autoFocus
-          style={styles.textBox}
+          placeholder={t('login.email', { ns: 'auth' })}
         />
-        <TextInput
+        <Input
+          inputMode="text"
           onChangeText={setPassword}
-          placeholder="Password"
+          placeholder={t('login.password', { ns: 'auth' })}
           secureTextEntry={true}
-          style={styles.textBox}
         />
-        {error && <Text style={{ color: 'red' }}>{error}</Text>}
-        <View style={{ flexGrow: 1 }} />
-        <Pressable
-          disabled={!email || !password}
-          onPress={createAccount}
-          style={styles.botton}>
-          <Text style={styles.bottonText}>Create an Account</Text>
-        </Pressable>
-        <Pressable
-          disabled={!email || !password}
-          onPress={login}
-          style={styles.botton}>
-          <Text style={styles.bottonText}>Sign In</Text>
-        </Pressable>
-        <Pressable onPress={forgotPassword} style={styles.botton}>
-          <Text style={styles.bottonText}>Forgot password?</Text>
-        </Pressable>
+        <ErrorMessage>{error}</ErrorMessage>
+        <Button onPress={login} pressableProps={{ disabled }}>
+          {t('login.submit', { ns: 'auth' })}
+        </Button>
+        <Button onPress={createAccount} pressableProps={{ disabled }}>
+          {t('login.register', { ns: 'auth' })}
+        </Button>
+        <Button
+          onPress={forgotPassword}
+          pressableProps={{ disabled: appState !== AppState.IDLE }}>
+          {t('login.forgot', { ns: 'auth' })}
+        </Button>
       </KeyboardAvoidingView>
     </ScrollView>
   );
 };
 
+const shouldBeDisabled = (
+  email: string,
+  password: string,
+  appState: AppState,
+) => {
+  return (!email || !password) && appState !== AppState.IDLE;
+};
+
 const styles = StyleSheet.create({
-  sectionContentContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
   sectionContainer: {
     flexGrow: 1,
+    marginTop: spaces[32],
+    paddingHorizontal: spaces[24],
+  },
+  sectionContentContainer: {
     marginTop: 32,
-    paddingHorizontal: 24,
+    paddingHorizontal: spaces[6],
   },
   sectionTitle: {
     fontSize: 24,
@@ -182,12 +201,6 @@ const styles = StyleSheet.create({
   },
   highlight: {
     fontWeight: '700',
-  },
-  textBox: {
-    borderColor: 'black',
-    borderWidth: 1,
-    padding: 8,
-    margin: 8,
   },
   botton: {
     margin: 8,

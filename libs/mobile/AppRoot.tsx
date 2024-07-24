@@ -1,4 +1,4 @@
-import React, { Suspense, useCallback, useEffect, useMemo } from 'react';
+import React, { Suspense, useEffect, useMemo } from 'react';
 import 'react-native-url-polyfill/auto';
 import { StatusBar, Text, View, useColorScheme } from 'react-native';
 import { QueryClient, QueryClientProvider } from 'react-query';
@@ -20,7 +20,13 @@ import SecureStorageService from './src/services/SecureStorageService';
 import { dev } from './src/utils/console';
 import HttpService from './src/services/HttpService';
 import AuthService from './src/services/AuthService';
-import { User as SupabaseAuthUser } from '@supabase/supabase-js';
+import {
+  AuthChangeEvent,
+  User as SupabaseAuthUser,
+} from '@supabase/supabase-js';
+import { I18nextProvider } from 'react-i18next';
+import i18n from './src/services/I18nService';
+import { colors } from './src/utils/theme';
 
 const queryClient = new QueryClient();
 const RootStack = createNativeStackNavigator();
@@ -213,7 +219,7 @@ function NavigationRoot(): React.JSX.Element {
   }, [appState, authProviderUser]);
 
   useEffect(() => {
-    AuthService.authClient.onAuthStateChange((event, session) => {
+    AuthService.authClient.onAuthStateChange((event: AuthChangeEvent) => {
       if (event === 'SIGNED_OUT') {
         dev('User is signed out.');
         nav.reset({
@@ -226,11 +232,12 @@ function NavigationRoot(): React.JSX.Element {
   }, []);
 
   return (
-    <>
+    <I18nextProvider i18n={i18n}>
       <RootStack.Navigator screenOptions={{ headerShown: false }}>
         <RootStack.Screen name="AuthController">
           {() => (
             <AuthController
+              appState={appState}
               setAppState={setAppState}
               setAuthProviderUser={setAuthProviderUser}
             />
@@ -243,7 +250,7 @@ function NavigationRoot(): React.JSX.Element {
         <RootStack.Screen name="AppTabNavigator" component={AppTabNavigator} />
       </RootStack.Navigator>
       <SplashScreen appState={appState} />
-    </>
+    </I18nextProvider>
   );
 }
 
@@ -284,22 +291,3 @@ function AppRoot(): React.JSX.Element {
 }
 
 export default AppRoot;
-
-const colors: { dark: Theme['colors']; light: Theme['colors'] } = {
-  dark: {
-    primary: '#1E90FF', // DodgerBlue
-    background: '#121212', // Dark Gray
-    card: '#1E1E1E', // Slightly lighter dark gray
-    text: '#FFFFFF', // White
-    border: '#272727', // Medium Gray
-    notification: '#32CD32', // LimeGreen
-  },
-  light: {
-    primary: '#1E90FF', // DodgerBlue
-    background: '#FFFFFF', // White
-    card: '#F8F8F8', // Light Gray
-    text: '#000000', // Black
-    border: '#DDDDDD', // Light Gray
-    notification: '#32CD32', // LimeGreen
-  },
-};

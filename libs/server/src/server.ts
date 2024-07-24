@@ -6,7 +6,8 @@ import Express = require("express");
 import Db from "./db";
 import AuthRoutes from "./routes/auth";
 import AppRoutes from "./routes/app";
-import HealhCheckRoutes from "./routes/health";
+import CheckRoutes from "./routes/check";
+import LocaleRoutes from "./routes/locales";
 
 export default class Server {
   public listen: Express.Application["listen"];
@@ -26,9 +27,10 @@ export default class Server {
   private init(app: Express.Application, db: Db): Express.Application["listen"] {
     // setup the routes
     console.log("Initializing API routes...");
+    new CheckRoutes(app);
+    new LocaleRoutes(app);
     new AuthRoutes(db, app);
     new AppRoutes(db, app);
-    new HealhCheckRoutes(app);
 
     return () =>
       app.listen(this.port, () => {
